@@ -70,7 +70,7 @@ func Authentication() gin.HandlerFunc {
 			return
 		}
 
-		_, err = redis.RedisClient0.Get(c, fmt.Sprintf("user_id:%s", claims.UserID.String())).Result()
+		data, err := redis.RedisClient0.Get(c, fmt.Sprintf("user_id:%s", claims.UserID.String())).Result()
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, tools.Response{
 				Status:  "Unauthorized",
@@ -81,6 +81,7 @@ func Authentication() gin.HandlerFunc {
 
 		// Store claims in context
 		c.Set(authentication.UserIDKey, claims.UserID.String())
+		c.Set(authentication.SessionKey, data)
 
 		// Validate Success
 		c.Next()
