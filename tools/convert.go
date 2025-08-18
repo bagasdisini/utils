@@ -46,3 +46,11 @@ func ConvertStringToJSON(s string, data any) (any, error) {
 func ConvertJSONToString(data any) ([]byte, error) {
 	return json.Marshal(data)
 }
+
+func StringValue(v *string) string {
+	if v == nil || *v == "" {
+		return ""
+	}
+
+	return *v
+}
