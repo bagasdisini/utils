@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rnd-varnion/utils/authentication"
@@ -18,31 +20,31 @@ func Permission(app, menu, permission string) gin.HandlerFunc {
 			return
 		}
 
-		// Logic Permission
-		permissionHeader := c.GetHeader("Permission-Token")
-		if permissionHeader == "" {
+		userSessionData := c.GetString(authentication.SessionKey)
+		if userSessionData == "" {
 			c.AbortWithStatusJSON(http.StatusForbidden, tools.Response{
 				Status:  "Forbidden",
-				Message: "Permission token is required",
+				Message: "Session not found",
 			})
 			return
 		}
 
-		permissionClaim, err := tools.ValidatePermissionToken(permissionHeader)
+		var userSession authentication.UserSession
+		err := json.Unmarshal([]byte(userSessionData), &userSession)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusForbidden, tools.Response{
 				Status:  "Forbidden",
-				Message: "Invalid or expired permission token",
+				Message: "Failed to bind user session data",
 			})
 			return
 		}
 
 		// Check if the required app, menu, and permission exist in the claims
 		hasPermission := false
-		for _, permToken := range permissionClaim.Data {
-			if permToken.AppName == app {
+		for _, permToken := range userSession.Permissions {
+			if strings.EqualFold(permToken.AppName, app) {
 				for _, menuItem := range permToken.Menus {
-					if menuItem.MenuName == menu {
+					if strings.EqualFold(menuItem.MenuName, menu) {
 						for _, perm := range menuItem.Permission {
 							if perm != nil && *perm == permission {
 								hasPermission = true
@@ -105,9 +107,9 @@ func PermissionBulk(payload []permission.BulkPayload) gin.HandlerFunc {
 		hasPermission := false
 		for _, payloadItem := range payload {
 			for _, permToken := range permissionClaim.Data {
-				if permToken.AppName == payloadItem.App {
+				if strings.EqualFold(permToken.AppName, payloadItem.App) {
 					for _, menuItem := range permToken.Menus {
-						if menuItem.MenuName == payloadItem.Menu {
+						if strings.EqualFold(menuItem.MenuName, payloadItem.Menu) {
 							for _, perm := range menuItem.Permission {
 								if perm != nil && *perm == payloadItem.Permission {
 									hasPermission = true

@@ -21,3 +21,13 @@ type BulkPayload struct {
 	Menu       string
 	Permission string
 }
+
+type Permission struct {
+	AppName string  `json:"app_name"`
+	Menus   []*Menu `json:"menus"`
+}
+
+type Menu struct {
+	MenuName   string    `json:"menu_name"`
+	Permission []*string `json:"permission"`
+}
