@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -69,7 +70,7 @@ func Authentication() gin.HandlerFunc {
 			return
 		}
 
-		_, err = redis.RedisClient0.Get(c, claims.UserID.String()).Result()
+		_, err = redis.RedisClient0.Get(c, fmt.Sprintf("user_id:%s", claims.UserID.String())).Result()
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, tools.Response{
 				Status:  "Unauthorized",
