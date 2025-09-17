@@ -5,10 +5,17 @@ import (
 	"net"
 	"os"
 	"runtime"
+	"strconv"
+	"sync"
 	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
+)
+
+var (
+	systemActivityLogger *logrus.Logger
+	systemOnce           sync.Once
 )
 
 var (
@@ -161,4 +168,30 @@ func (hook *ErrorCallerHook) Levels() []logrus.Level {
 		logrus.FatalLevel,
 		logrus.PanicLevel,
 	}
+}
+
+// InitSystemActivityLogger initializes the system activity logger singleton
+func InitSystemActivityLogger() *logrus.Logger {
+	useLogstash, err := strconv.ParseBool(os.Getenv(LOG_USE_LOGSTASH))
+	if err != nil {
+		useLogstash = false
+	}
+
+	systemOnce.Do(func() {
+		systemActivityLogger = InitCustomLogger("system_activity", "info", useLogstash)
+	})
+	return systemActivityLogger
+}
+
+// GetSystemActivityLogger returns the singleton system activity logger
+func GetSystemActivityLogger() *logrus.Logger {
+	if systemActivityLogger == nil {
+		return InitSystemActivityLogger()
+	}
+	return systemActivityLogger
+}
+
+// LogSystem logs a message with fields to the system activity logger
+func LogSystem(fields logrus.Fields, msg string) {
+	GetSystemActivityLogger().WithFields(fields).Info(msg)
 }
