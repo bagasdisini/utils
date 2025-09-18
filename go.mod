@@ -3,6 +3,7 @@ module github.com/rnd-varnion/utils
 go 1.23.4
 
 require (
+	github.com/RichardKnop/machinery/v2 v2.0.16
 	github.com/elastic/go-elasticsearch/v8 v8.18.0
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-sql-driver/mysql v1.9.3
@@ -17,7 +18,6 @@ require (
 	cloud.google.com/go v0.75.0 // indirect
 	cloud.google.com/go/pubsub v1.10.0 // indirect
 	github.com/RichardKnop/logging v0.0.0-20190827224416-1a693bdd4fae // indirect
-	github.com/RichardKnop/machinery/v2 v2.0.16 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.38.1 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.34 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.34 // indirect
